@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>xinwaychinese · 双面闪卡 (情感/学习/科技词汇)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #f1ebe5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 12px;
+        }
+        .card-frame {
+            width: 100%;
+            max-width: 700px;
+            background-color: #fdf8f2;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05);
+            padding: 24px 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #e6d5b8;
+        }
+        .header-icon {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin-bottom: 16px; width: 100%;
+        }
+        .icon-badge {
+            background: #ffb347;
+            border-radius: 60px;
+            padding: 8px 18px 8px 15px;
+            display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 6px 0 #c15a1c;
+            border: 2px solid #a04500;
+        }
+        .icon-badge span { font-size: 2.2rem; line-height: 1; filter: drop-shadow(2px 2px 0 #f28500); }
+        .icon-badge h1 {
+            font-size: 1.9rem;
+            font-family: '楷体', 'KaiTi', '华文楷体', 'STKaiti', serif;
+            color: #2d1b0c; letter-spacing: 3px; font-weight: 600;
+            margin-right: 5px; text-shadow: 1px 1px 0 #fce5b1;
+        }
+        .blackboard-area {
+            width: 100%; flex: 2 1 auto;
+            min-height: 380px; max-height: 60vh;
+            aspect-ratio: 4/3; margin: 10px 0 20px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .flip-container {
+            width: 100%; height: 100%; min-height: 300px;
+            background-color: transparent;
+            perspective: 2000px; cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 20px 0 #3a4a3f, 0 25px 30px -5px rgba(0,0,0,0.4);
+        }
+        .flip-inner {
+            position: relative; width: 100%; height: 100%;
+            text-align: center; transition: transform 0.5s;
+            transform-style: preserve-3d; border-radius: 30px;
+        }
+        .flip-inner.flipped { transform: rotateY(180deg); }
+        .front, .back {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            background: #2b4b3a;
+            background-image: radial-gradient(circle at 10px 10px, #3f6b4f 2px, transparent 2px),
+                              radial-gradient(circle at 30px 25px, #3f6b4f 2px, transparent 2px);
+            background-size: 60px 60px, 120px 120px;
+            border: 12px solid #6f4f2e;
+            border-radius: 40px;
+            box-shadow: inset 0 -5px 0 #3d5a3d, inset 0 5px 10px rgba(255,255,240,0.3), 0 10px 0 #4d3e2b;
+            padding: 25px 20px 20px;
+            display: flex; flex-direction: column;
+            color: #f5f2da;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            overflow-y: auto;
+        }
+        .back { transform: rotateY(180deg); }
+        .xinway-tag {
+            position: absolute; top: 12px; left: 18px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.4rem; font-weight: 600;
+            color: #f9e0a0; text-shadow: 2px 2px 0 #3a5e3a;
+            letter-spacing: 1px; z-index: 10;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 8px 2px 6px; border-radius: 40px;
+            backdrop-filter: blur(1px);
+            border: 1px dashed #e8c37b; opacity: 0.95;
+            pointer-events: none;
+        }
+        .word-area {
+            flex: 2; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            margin-top: 25px;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            pointer-events: none;
+        }
+        .chinese-word {
+            font-size: 7vw; font-weight: 700; line-height: 1.2;
+            margin-bottom: 0.2rem;
+            text-shadow: 4px 4px 0 #1f3a27;
+            color: #fff9e0; word-break: break-word; max-width: 90%;
+        }
+        .example-sentence {
+            font-size: 3.8vw;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            background: rgba(255,250,210,0.15);
+            padding: 10px 14px; border-radius: 60px;
+            border-left: 5px solid #ffd966;
+            color: #fef9d7; margin: 8px 0 5px;
+            max-width: 95%; word-break: break-word;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        .back-content {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100%; width: 100%;
+            font-family: 'Times New Roman', Times, serif;
+            margin-top: 25px; gap: 0.6rem;
+            color: #f5f0cf; pointer-events: none;
+        }
+        .pinyin {
+            font-size: 5vw; font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+            background: #3b5e4b; padding: 5px 20px;
+            border-radius: 50px; border: 2px solid #c9ae74;
+            width: fit-content;
+        }
+        .pos {
+            font-size: 4.2vw;
+            font-family: 'Times New Roman', Times, serif;
+            background: #637a54; padding: 6px 22px;
+            border-radius: 40px; color: #fef7cd; font-weight: 500;
+        }
+        .russian {
+            font-size: 4vw;
+            font-family: 'Times New Roman', Times, serif;
+            background: #2a4230; padding: 10px 20px;
+            border-radius: 50px; border: 2px dashed #f1cf8a;
+            max-width: 95%; word-break: break-word;
+        }
+        .button-bar {
+            width: 100%; display: flex; justify-content: center;
+            align-items: center; gap: 25px; margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: #f3d9a4; border: 4px solid #ba8b4a;
+            color: #3d2b13; font-size: 1.7rem; font-weight: bold;
+            padding: 12px 35px; border-radius: 60px;
+            box-shadow: 0 7px 0 #7b5a38; cursor: pointer;
+            transition: all 0.06s linear;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 2px; min-width: 140px; text-align: center;
+        }
+        .action-btn:active { transform: translateY(5px); box-shadow: 0 2px 0 #7b5a38; }
+        .action-btn:disabled { opacity: 0.4; transform: translateY(3px); box-shadow: 0 4px 0 #7b5a38; pointer-events: none; }
+        .small-btn { font-size: 1.5rem; padding: 8px 20px; min-width: 110px; }
+        .nav-btn { background: #b6d7a8; border-color: #3f7842; box-shadow: 0 6px 0 #2a5e2a; color: #1f3f1f; }
+        .hidden { display: none !important; }
+        .success-message {
+            width: 100%; height: 100%;
+            background: #2b4b3a; border-radius: 40px;
+            border: 12px solid #6f4f2e;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; color: #ffd966;
+            font-family: '楷体', 'KaiTi', serif;
+            box-shadow: inset 0 0 30px #c9ae74, 0 15px 0 #4d3e2b;
+        }
+        .success-message span {
+            font-size: 5vw; font-weight: bold;
+            background: #5f4230; padding: 10px 35px;
+            border-radius: 60px; border: 4px solid #f9cb7b;
+        }
+        @media (max-width: 500px) {
+            .chinese-word { font-size: 14vw; }
+            .example-sentence { font-size: 5vw; }
+            .pinyin { font-size: 6vw; }
+            .pos { font-size: 5.5vw; }
+            .russian { font-size: 5vw; }
+            .action-btn { font-size: 1.4rem; padding: 10px 15px; min-width: 110px; }
+            .xinway-tag { font-size: 1.1rem; top: 6px; left: 10px; }
+            .blackboard-area { min-height: 320px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card-frame">
+    <div class="header-icon">
+        <div class="icon-badge">
+            <span>💖💻</span>
+            <h1>词语练习</h1>
+        </div>
+    </div>
+
+    <div class="blackboard-area" id="blackboardArea">
+        <div id="flashcardContainer" style="width:100%;height:100%;">
+            <div class="flip-container" id="flipContainer">
+                <div class="flip-inner" id="flipInner">
+                    <div class="front" id="cardFront">
+                        <span class="xinway-tag">xinwaychinese</span>
+                        <div class="word-area" id="frontContent">
+                            <div class="chinese-word" id="wordDisplay"></div>
+                            <div class="example-sentence" id="sentenceDisplay"></div>
+                        </div>
+                    </div>
+                    <div class="back" id="cardBack">
+                        <span class="xinway-tag">xinwaychinese</span>
+                        <div class="back-content" id="backContent">
+                            <div class="pinyin" id="pinyinDisplay"></div>
+                            <div class="pos" id="posDisplay"></div>
+                            <div class="russian" id="ruDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="successScreen" class="success-message hidden">
+            <span>🎉 挑战成功 🎉</span>
+            <button class="action-btn small-btn" id="restartFromSuccess">重新开始</button>
+        </div>
+    </div>
+
+    <div class="button-bar" id="buttonBar">
+        <button class="action-btn" id="startBtn">开始</button>
+        <button class="action-btn nav-btn hidden" id="prevBtn">◀ 上一个</button>
+        <button class="action-btn nav-btn hidden" id="nextBtn">下一个 ▶</button>
+        <button class="action-btn small-btn hidden" id="restartBtn">重新开始</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    const isApple = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+    if (isApple) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+        else initApp();
+    } else initApp();
+
+    function initApp(){
+        const cards = [
+            { word:"情缘", pinyin:"qíngyuán", pos:"(n.)", ru:"предопределённая любовь, сентиментальная связь", ex:"他们之间有一段情缘。" },
+            { word:"逻辑", pinyin:"luójí", pos:"(n.)", ru:"логика", ex:"他的逻辑很清楚。" },
+            { word:"硬", pinyin:"yìng", pos:"(adv.)", ru:"жёстко, механически", ex:"不要硬背单词。" },
+            { word:"死记硬背", pinyin:"sǐjì-yìngbèi", pos:"—", ru:"заучивать механически, без понимания", ex:"学习不能死记硬背。" },
+            { word:"偶然", pinyin:"ǒurán", pos:"(adj./adv.)", ru:"случайный; случайно", ex:"我们是偶然认识的。" },
+            { word:"演变", pinyin:"yǎnbiàn", pos:"(v.)", ru:"изменяться, эволюционировать", ex:"语言会不断演变。" },
+            { word:"遗憾", pinyin:"yíhàn", pos:"(adj./n.)", ru:"сожалеющий; глубокое сожаление", ex:"没去真遗憾。" },
+            { word:"心脏", pinyin:"xīnzàng", pos:"(n.)", ru:"сердце", ex:"心脏很重要。" },
+            { word:"思考", pinyin:"sīkǎo", pos:"(v.)", ru:"глубоко думать, размышлять", ex:"要认真思考。" },
+            { word:"抓紧", pinyin:"zhuājǐn", pos:"(v.)", ru:"крепко схватить, не терять времени", ex:"抓紧时间。" },
+            { word:"尽快", pinyin:"jǐnkuài", pos:"(adv.)", ru:"как можно скорее", ex:"请尽快回复。" },
+            { word:"经典", pinyin:"jīngdiǎn", pos:"(n./adj.)", ru:"классика; классический", ex:"这是一部经典电影。" },
+            { word:"库", pinyin:"kù", pos:"(n.)", ru:"хранилище, склад, банк (данных)", ex:"数据库很重要。" },
+            { word:"输入", pinyin:"shūrù", pos:"(v.)", ru:"вводить (данные)", ex:"输入密码。" },
+            { word:"元旦", pinyin:"yuándàn", pos:"(n.)", ru:"Новый год (1 января)", ex:"元旦放假。" },
+            { word:"疾病", pinyin:"jíbìng", pos:"(n.)", ru:"болезнь, заболевание", ex:"预防疾病。" },
+            { word:"创办", pinyin:"chuàngbàn", pos:"(v.)", ru:"основывать, учреждать", ex:"他创办了一家公司。" },
+            { word:"公开", pinyin:"gōngkāi", pos:"(v./adj.)", ru:"обнародовать; открытый", ex:"信息公开。" },
+            { word:"最初", pinyin:"zuìchū", pos:"(n.)", ru:"вначале, первоначально", ex:"最初我不太明白。" },
+            { word:"痛苦", pinyin:"tòngkǔ", pos:"(adj.)", ru:"болезненный, мучительный", ex:"这是一段痛苦的经历。" },
+            { word:"微博", pinyin:"wēibó", pos:"(n.)", ru:"микроблог", ex:"他常在微博上发消息。" },
+            { word:"称呼", pinyin:"chēnghu", pos:"(v./n.)", ru:"называть, обращаться; форма обращения", ex:"怎么称呼你？" },
+            { word:"克服", pinyin:"kèfú", pos:"(v.)", ru:"преодолевать, побеждать", ex:"克服困难。" },
+            { word:"收集", pinyin:"shōují", pos:"(v.)", ru:"собирать, коллекционировать", ex:"收集邮票。" },
+            { word:"包含", pinyin:"bāohán", pos:"(v.)", ru:"содержать, включать", ex:"这个价格包含早餐。" },
+            { word:"繁体字", pinyin:"fántǐ zì", pos:"(n.)", ru:"полная форма, традиционные иероглифы", ex:"繁体字笔画很多。" },
+            { word:"简体字", pinyin:"jiǎntǐ zì", pos:"(n.)", ru:"упрощённая форма, упрощённые иероглифы", ex:"简体字更容易写。" },
+            { word:"方言", pinyin:"fāngyán", pos:"(n.)", ru:"диалект", ex:"中国有很多方言。" },
+            { word:"称赞", pinyin:"chēngzàn", pos:"(v.)", ru:"хвалить, одобрять", ex:"老师称赞了他。" },
+            { word:"真相", pinyin:"zhēnxiàng", pos:"(n.)", ru:"правда, истинное положение дел", ex:"我们要了解真相。" },
+            { word:"佩服", pinyin:"pèifú", pos:"(v.)", ru:"восхищаться", ex:"我很佩服他。" },
+            { word:"开放", pinyin:"kāifàng", pos:"(v.)", ru:"открывать для публики", ex:"图书馆对外开放。" },
+            { word:"下载", pinyin:"xiàzài", pos:"(v.)", ru:"скачивать", ex:"下载文件。" },
+            { word:"单位", pinyin:"dānwèi", pos:"(n.)", ru:"организация, работодатель", ex:"他在哪个单位工作？" },
+            { word:"识别", pinyin:"shíbié", pos:"(v.)", ru:"распознавать, идентифицировать", ex:"识别二维码。" },
+            { word:"查询", pinyin:"cháxún", pos:"(v.)", ru:"искать, запрашивать (информацию)", ex:"查询信息。" },
+            { word:"物理", pinyin:"wùlǐ", pos:"(n.)", ru:"физика", ex:"我喜欢物理课。" },
+            { word:"完善", pinyin:"wánshàn", pos:"(v./adj.)", ru:"совершенствовать; совершенный", ex:"系统还需要完善。" },
+            { word:"退休", pinyin:"tuìxiū", pos:"(v.)", ru:"выходить на пенсию", ex:"爷爷退休了。" },
+            { word:"日程", pinyin:"rìchéng", pos:"(n.)", ru:"расписание, график", ex:"日程安排很满。" },
+            { word:"追求", pinyin:"zhuīqiú", pos:"(v.)", ru:"стремиться к, добиваться", ex:"追求梦想。" },
+            { word:"梦想", pinyin:"mèngxiǎng", pos:"(n./v.)", ru:"мечта; мечтать", ex:"我的梦想是当医生。" },
+            { word:"哲学", pinyin:"zhéxué", pos:"(n.)", ru:"философия", ex:"哲学很有意思。" },
+            { word:"化学", pinyin:"huàxué", pos:"(n.)", ru:"химия", ex:"化学实验很有趣。" },
+            { word:"政治", pinyin:"zhèngzhì", pos:"(n.)", ru:"политика", ex:"他不关心政治。" },
+            { word:"粘贴", pinyin:"zhāntiē", pos:"(v.)", ru:"вставить", ex:"粘贴文字。" },
+            { word:"复制", pinyin:"fùzhì", pos:"(v.)", ru:"копировать", ex:"复制文件。" },
+            { word:"浏览", pinyin:"liúlǎn", pos:"(v.)", ru:"просматривать", ex:"浏览网页。" },
+            { word:"删除", pinyin:"shānchú", pos:"(v.)", ru:"удалять", ex:"删除文件。" },
+            { word:"搜索", pinyin:"sōusuǒ", pos:"(v.)", ru:"искать", ex:"搜索信息。" },
+            { word:"文件", pinyin:"wénjiàn", pos:"(n.)", ru:"файл", ex:"打开文件。" }
+        ];
+
+        const startBtn=document.getElementById('startBtn');
+        const prevBtn=document.getElementById('prevBtn');
+        const nextBtn=document.getElementById('nextBtn');
+        const restartBtn=document.getElementById('restartBtn');
+        const restartFromSuccess=document.getElementById('restartFromSuccess');
+        const flipContainer=document.getElementById('flipContainer');
+        const flipInner=document.getElementById('flipInner');
+        const flashcardContainer=document.getElementById('flashcardContainer');
+        const successScreen=document.getElementById('successScreen');
+        const wordDisplay=document.getElementById('wordDisplay');
+        const sentenceDisplay=document.getElementById('sentenceDisplay');
+        const pinyinDisplay=document.getElementById('pinyinDisplay');
+        const posDisplay=document.getElementById('posDisplay');
+        const ruDisplay=document.getElementById('ruDisplay');
+
+        let currentIndex=0, gameActive=false;
+
+        function updateCardContent(){
+            if(currentIndex>=0&&currentIndex<cards.length){
+                const c=cards[currentIndex];
+                wordDisplay.textContent=c.word;
+                sentenceDisplay.textContent=c.ex;
+                pinyinDisplay.textContent=c.pinyin;
+                posDisplay.textContent=c.pos;
+                ruDisplay.textContent=c.ru;
+            }
+        }
+        function resetFlip(){ flipInner.classList.remove('flipped'); }
+        function showScreenByIndex(){
+            if(currentIndex>=cards.length){
+                flashcardContainer.classList.add('hidden');
+                successScreen.classList.remove('hidden');
+                restartBtn.classList.remove('hidden');
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+                startBtn.classList.add('hidden');
+            }else{
+                flashcardContainer.classList.remove('hidden');
+                successScreen.classList.add('hidden');
+                updateCardContent();
+                resetFlip();
+                if(gameActive){
+                    startBtn.classList.add('hidden');
+                    prevBtn.classList.remove('hidden');
+                    nextBtn.classList.remove('hidden');
+                    restartBtn.classList.remove('hidden');
+                }else{
+                    startBtn.classList.remove('hidden');
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    restartBtn.classList.add('hidden');
+                }
+            }
+        }
+        function startGame(){ gameActive=true; if(currentIndex>=cards.length)currentIndex=0; showScreenByIndex(); }
+        function restartGame(){ currentIndex=0; gameActive=true; resetFlip(); showScreenByIndex(); }
+        function goPrev(){ if(!gameActive)return; if(currentIndex>0){currentIndex--;showScreenByIndex();} }
+        function goNext(){ if(!gameActive)return; if(currentIndex<cards.length-1){currentIndex++;showScreenByIndex();} else if(currentIndex===cards.length-1){currentIndex++;showScreenByIndex();} }
+        function handleBlackboardClick(){
+            if(!gameActive||currentIndex>=cards.length)return;
+            flipInner.classList.toggle('flipped');
+        }
+
+        flipContainer.addEventListener('click',handleBlackboardClick);
+        startBtn.addEventListener('click',e=>{e.stopPropagation();startGame();});
+        prevBtn.addEventListener('click',e=>{e.stopPropagation();goPrev();});
+        nextBtn.addEventListener('click',e=>{e.stopPropagation();goNext();});
+        restartBtn.addEventListener('click',e=>{e.stopPropagation();restartGame();});
+        restartFromSuccess.addEventListener('click',e=>{e.stopPropagation();restartGame();});
+
+        currentIndex=0; gameActive=false; showScreenByIndex(); resetFlip();
+    }
+})();
+</script>
+</body>
+</html>
